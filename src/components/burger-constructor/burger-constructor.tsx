@@ -9,7 +9,10 @@ type TBurgerConstructorProps = {
 export const BurgerConstructor = ({
   ingredients,
 }: TBurgerConstructorProps): React.JSX.Element => {
-  console.log(ingredients);
-
-  return <section className={styles.burger_constructor}></section>;
+  return (
+    <section
+      className={styles.burger_constructor}
+      aria-label={`Конструктор бургера: ${ingredients.length}`}
+    ></section>
+  );
 };

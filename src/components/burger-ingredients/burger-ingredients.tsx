@@ -11,10 +11,11 @@ type TBurgerIngredientsProps = {
 export const BurgerIngredients = ({
   ingredients,
 }: TBurgerIngredientsProps): React.JSX.Element => {
-  console.log(ingredients);
-
   return (
-    <section className={styles.burger_ingredients}>
+    <section
+      className={styles.burger_ingredients}
+      aria-label={`Ингредиенты: ${ingredients.length}`}
+    >
       <nav>
         <ul className={styles.menu}>
           <Tab
