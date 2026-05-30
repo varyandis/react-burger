@@ -7,6 +7,7 @@ import styles from './burger-ingredients.module.css';
 
 type TBurgerIngredientsProps = {
   ingredients: TIngredient[];
+  onIngredientClick: (ingredient: TIngredient) => void;
 };
 
 type TIngredientGroup = {
@@ -25,6 +26,7 @@ const getIngredientCount = (type: TIngredient['type'], index: number): number =>
 
 export const BurgerIngredients = ({
   ingredients,
+  onIngredientClick,
 }: TBurgerIngredientsProps): React.JSX.Element => {
   const [currentTab, setCurrentTab] = useState<TIngredient['type']>('bun');
   const sectionRefs = useRef<Record<TIngredient['type'], HTMLElement | null>>({
@@ -113,7 +115,22 @@ export const BurgerIngredients = ({
 
                 return (
                   <li key={ingredient._id} className={styles.item}>
-                    <article className={styles.card}>
+                    <article
+                      className={styles.card}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => onIngredientClick(ingredient)}
+                      onKeyDown={(event) => {
+                        if (event.key === ' ') {
+                          event.preventDefault();
+                          onIngredientClick(ingredient);
+                        }
+
+                        if (event.key === 'Enter') {
+                          onIngredientClick(ingredient);
+                        }
+                      }}
+                    >
                       {count > 0 && (
                         <div className={styles.counter}>
                           <Counter count={count} size="default" />

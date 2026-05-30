@@ -12,10 +12,12 @@ import styles from './burger-constructor.module.css';
 
 type TBurgerConstructorProps = {
   ingredients: TIngredient[];
+  onOrderClick: () => void;
 };
 
 export const BurgerConstructor = ({
   ingredients,
+  onOrderClick,
 }: TBurgerConstructorProps): React.JSX.Element => {
   const bun = useMemo(
     () => ingredients.find((ingredient) => ingredient.type === 'bun'),
@@ -81,7 +83,7 @@ export const BurgerConstructor = ({
           <span className="text text_type_digits-medium mr-2">{totalPrice}</span>
           <CurrencyIcon type="primary" />
         </div>
-        <Button htmlType="button" type="primary" size="large">
+        <Button htmlType="button" type="primary" size="large" onClick={onOrderClick}>
           Оформить заказ
         </Button>
       </div>
