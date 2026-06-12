@@ -7,43 +7,22 @@ import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredi
 import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
 import { Modal } from '@components/modal/modal';
 import { OrderDetails } from '@components/order-details/order-details';
-import { getIngredients } from '@utils/api';
+import { useAppDispatch, useAppSelector } from '@services/hooks';
+import { fetchIngredients } from '@services/slices/ingredients-slice';
 
 import type { TIngredient } from '@utils/types';
 
 import styles from './app.module.css';
 
 export const App = (): React.JSX.Element => {
-  const [ingredients, setIngredients] = useState<TIngredient[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
   const [selectedIngredient, setSelectedIngredient] = useState<TIngredient | null>(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const { error, ingredients, isLoading } = useAppSelector((state) => state.ingredients);
 
   useEffect(() => {
-    let isMounted = true;
-
-    getIngredients()
-      .then((ingredientsData) => {
-        if (isMounted) {
-          setIngredients(ingredientsData);
-        }
-      })
-      .catch((err: Error) => {
-        if (isMounted) {
-          setError(err.message);
-        }
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      });
-
-    return (): void => {
-      isMounted = false;
-    };
-  }, []);
+    void dispatch(fetchIngredients());
+  }, [dispatch]);
 
   const handleIngredientClick = useCallback((ingredient: TIngredient): void => {
     setSelectedIngredient(ingredient);

@@ -4,7 +4,10 @@ import {
   CurrencyIcon,
   DragIcon,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+
+import { useAppDispatch, useAppSelector } from '@services/hooks';
+import { initializeConstructor } from '@services/slices/constructor-slice';
 
 import type { TIngredient } from '@utils/types';
 
@@ -19,14 +22,15 @@ export const BurgerConstructor = ({
   ingredients,
   onOrderClick,
 }: TBurgerConstructorProps): React.JSX.Element => {
-  const bun = useMemo(
-    () => ingredients.find((ingredient) => ingredient.type === 'bun'),
-    [ingredients]
+  const dispatch = useAppDispatch();
+  const { bun, ingredients: selectedIngredients } = useAppSelector(
+    (state) => state.burgerConstructor
   );
-  const selectedIngredients = useMemo(
-    () => ingredients.filter((ingredient) => ingredient.type !== 'bun').slice(0, 5),
-    [ingredients]
-  );
+
+  useEffect(() => {
+    dispatch(initializeConstructor(ingredients));
+  }, [dispatch, ingredients]);
+
   const totalPrice = useMemo(() => {
     const bunPrice = bun ? bun.price * 2 : 0;
     const ingredientsPrice = selectedIngredients.reduce(
@@ -59,7 +63,7 @@ export const BurgerConstructor = ({
       </div>
       <ul className={`${styles.list} custom-scroll`}>
         {selectedIngredients.map((ingredient) => (
-          <li key={ingredient._id} className={styles.item}>
+          <li key={ingredient.constructorId} className={styles.item}>
             <DragIcon type="primary" />
             <ConstructorElement
               text={ingredient.name}
