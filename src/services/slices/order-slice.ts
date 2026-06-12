@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import { createOrder as createOrderApi } from '@utils/api';
+import { createOrder } from '@services/actions/order-actions';
 
 type TOrderState = {
   orderNumber: number | null;
@@ -14,20 +14,7 @@ const initialState: TOrderState = {
   error: null,
 };
 
-export const createOrder = createAsyncThunk<number, string[], { rejectValue: string }>(
-  'order/createOrder',
-  async (ingredients, { rejectWithValue }) => {
-    try {
-      return await createOrderApi(ingredients);
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : 'Failed to create order'
-      );
-    }
-  }
-);
-
-const orderSlice = createSlice({
+export const orderSlice = createSlice({
   name: 'order',
   initialState,
   reducers: {

@@ -8,12 +8,12 @@ import { useCallback } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { useAppDispatch, useAppSelector } from '@services/hooks';
-import { selectConstructorTotalPrice } from '@services/selectors/constructor-selectors';
 import {
   addIngredient,
   chooseBun,
   moveIngredient,
   removeIngredient,
+  selectConstructorTotalPrice,
 } from '@services/slices/constructor-slice';
 import { DND_ITEM_TYPES } from '@utils/dnd';
 

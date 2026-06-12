@@ -3,7 +3,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { useDrag } from 'react-dnd';
 
 import { useAppSelector } from '@services/hooks';
-import { selectIngredientCounters } from '@services/selectors/constructor-selectors';
+import { selectIngredientCounters } from '@services/slices/constructor-slice';
 import { DND_ITEM_TYPES } from '@utils/dnd';
 
 import type { TIngredient } from '@utils/types';

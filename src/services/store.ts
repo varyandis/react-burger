@@ -1,17 +1,20 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { combineSlices, configureStore } from '@reduxjs/toolkit';
 
-import { constructorReducer } from '@services/slices/constructor-slice';
-import { ingredientDetailsReducer } from '@services/slices/ingredient-details-slice';
-import { ingredientsReducer } from '@services/slices/ingredients-slice';
-import { orderReducer } from '@services/slices/order-slice';
+import { constructorSlice } from '@services/slices/constructor-slice';
+import { ingredientDetailsSlice } from '@services/slices/ingredient-details-slice';
+import { ingredientsSlice } from '@services/slices/ingredients-slice';
+import { orderSlice } from '@services/slices/order-slice';
+
+const rootReducer = combineSlices(
+  constructorSlice,
+  ingredientDetailsSlice,
+  ingredientsSlice,
+  orderSlice
+);
 
 export const store = configureStore({
-  reducer: {
-    burgerConstructor: constructorReducer,
-    ingredientDetails: ingredientDetailsReducer,
-    ingredients: ingredientsReducer,
-    order: orderReducer,
-  },
+  reducer: rootReducer,
+  devTools: import.meta.env.DEV,
 });
 
 export type RootState = ReturnType<typeof store.getState>;

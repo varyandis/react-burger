@@ -7,13 +7,14 @@ import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredi
 import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
 import { Modal } from '@components/modal/modal';
 import { OrderDetails } from '@components/order-details/order-details';
+import { fetchIngredients } from '@services/actions/ingredients-actions';
+import { createOrder } from '@services/actions/order-actions';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
 import {
   clearSelectedIngredient,
   setSelectedIngredient,
 } from '@services/slices/ingredient-details-slice';
-import { fetchIngredients } from '@services/slices/ingredients-slice';
-import { clearOrder, createOrder } from '@services/slices/order-slice';
+import { clearOrder } from '@services/slices/order-slice';
 
 import type { TIngredient } from '@utils/types';
 
