@@ -59,6 +59,11 @@
   border-radius: var(--common-border-radius-s);
 }
 
+.placeholder_active {
+  outline: 1px solid var(--colors-interface-accent);
+  box-shadow: 0 0 16px rgb(76 76 255 / 25%);
+}
+
 .placeholder_top {
   border-radius: var(--top-constructor-item-border-radius);
 }

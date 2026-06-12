@@ -28,6 +28,7 @@ type TBurgerConstructorProps = {
 };
 
 type TDropCollectedProps = {
+  draggedIngredientType: TIngredient['type'] | null;
   isOver: boolean;
 };
 
@@ -111,7 +112,7 @@ export const BurgerConstructor = ({
   const dispatch = useAppDispatch();
   const { bun, ingredients } = useAppSelector((state) => state.burgerConstructor);
   const totalPrice = useAppSelector(selectConstructorTotalPrice);
-  const [{ isOver }, dropRef] = useDrop(
+  const [{ draggedIngredientType, isOver }, dropRef] = useDrop(
     () => ({
       accept: DND_ITEM_TYPES.ingredient,
       drop: (ingredient: TIngredient): void => {
@@ -122,9 +123,14 @@ export const BurgerConstructor = ({
 
         dispatch(addIngredient(ingredient));
       },
-      collect: (monitor: DropTargetMonitor): TDropCollectedProps => ({
-        isOver: monitor.isOver(),
-      }),
+      collect: (monitor: DropTargetMonitor): TDropCollectedProps => {
+        const item = monitor.getItem<TIngredient | null>();
+
+        return {
+          draggedIngredientType: item?.type ?? null,
+          isOver: monitor.isOver(),
+        };
+      },
     }),
     [dispatch]
   );
@@ -148,6 +154,9 @@ export const BurgerConstructor = ({
   );
 
   const isOrderDisabled = !bun || ingredients.length === 0;
+  const isBunPlaceholderActive = isOver && draggedIngredientType === 'bun';
+  const isIngredientPlaceholderActive =
+    isOver && (draggedIngredientType === 'main' || draggedIngredientType === 'sauce');
 
   return (
     <section
@@ -166,7 +175,9 @@ export const BurgerConstructor = ({
           />
         ) : (
           <div
-            className={`${styles.placeholder} ${styles.placeholder_top} text text_type_main-default text_color_inactive`}
+            className={`${styles.placeholder} ${styles.placeholder_top} ${
+              isBunPlaceholderActive ? styles.placeholder_active : ''
+            } text text_type_main-default text_color_inactive`}
           >
             Выберите булки
           </div>
@@ -186,7 +197,9 @@ export const BurgerConstructor = ({
         ) : (
           <li className={`${styles.item} ${styles.empty_item}`}>
             <div
-              className={`${styles.placeholder} text text_type_main-default text_color_inactive`}
+              className={`${styles.placeholder} ${
+                isIngredientPlaceholderActive ? styles.placeholder_active : ''
+              } text text_type_main-default text_color_inactive`}
             >
               Выберите начинку
             </div>
@@ -204,7 +217,9 @@ export const BurgerConstructor = ({
           />
         ) : (
           <div
-            className={`${styles.placeholder} ${styles.placeholder_bottom} text text_type_main-default text_color_inactive`}
+            className={`${styles.placeholder} ${styles.placeholder_bottom} ${
+              isBunPlaceholderActive ? styles.placeholder_active : ''
+            } text text_type_main-default text_color_inactive`}
           >
             Выберите булки
           </div>
