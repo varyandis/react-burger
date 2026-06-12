@@ -8,6 +8,10 @@ import { IngredientDetails } from '@components/ingredient-details/ingredient-det
 import { Modal } from '@components/modal/modal';
 import { OrderDetails } from '@components/order-details/order-details';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
+import {
+  clearSelectedIngredient,
+  setSelectedIngredient,
+} from '@services/slices/ingredient-details-slice';
 import { fetchIngredients } from '@services/slices/ingredients-slice';
 
 import type { TIngredient } from '@utils/types';
@@ -15,27 +19,30 @@ import type { TIngredient } from '@utils/types';
 import styles from './app.module.css';
 
 export const App = (): React.JSX.Element => {
-  const [selectedIngredient, setSelectedIngredient] = useState<TIngredient | null>(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const dispatch = useAppDispatch();
   const { error, ingredients, isLoading } = useAppSelector((state) => state.ingredients);
+  const { selectedIngredient } = useAppSelector((state) => state.ingredientDetails);
 
   useEffect(() => {
     void dispatch(fetchIngredients());
   }, [dispatch]);
 
-  const handleIngredientClick = useCallback((ingredient: TIngredient): void => {
-    setSelectedIngredient(ingredient);
-  }, []);
+  const handleIngredientClick = useCallback(
+    (ingredient: TIngredient): void => {
+      dispatch(setSelectedIngredient(ingredient));
+    },
+    [dispatch]
+  );
 
   const handleOrderClick = useCallback((): void => {
     setIsOrderModalOpen(true);
   }, []);
 
   const handleModalClose = useCallback((): void => {
-    setSelectedIngredient(null);
+    dispatch(clearSelectedIngredient());
     setIsOrderModalOpen(false);
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className={styles.app}>

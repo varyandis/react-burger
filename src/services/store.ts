@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import { constructorReducer } from '@services/slices/constructor-slice';
+import { ingredientDetailsReducer } from '@services/slices/ingredient-details-slice';
 import { ingredientsReducer } from '@services/slices/ingredients-slice';
 
 export const store = configureStore({
   reducer: {
     burgerConstructor: constructorReducer,
+    ingredientDetails: ingredientDetailsReducer,
     ingredients: ingredientsReducer,
   },
 });
