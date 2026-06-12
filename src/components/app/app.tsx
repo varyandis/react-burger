@@ -76,7 +76,7 @@ export const App = (): React.JSX.Element => {
             ingredients={ingredients}
             onIngredientClick={handleIngredientClick}
           />
-          <BurgerConstructor ingredients={ingredients} onOrderClick={handleOrderClick} />
+          <BurgerConstructor onOrderClick={handleOrderClick} />
         </main>
       )}
       {selectedIngredient && (
