@@ -13,6 +13,7 @@ import {
   setSelectedIngredient,
 } from '@services/slices/ingredient-details-slice';
 import { fetchIngredients } from '@services/slices/ingredients-slice';
+import { clearOrder, createOrder } from '@services/slices/order-slice';
 
 import type { TIngredient } from '@utils/types';
 
@@ -23,6 +24,9 @@ export const App = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const { error, ingredients, isLoading } = useAppSelector((state) => state.ingredients);
   const { selectedIngredient } = useAppSelector((state) => state.ingredientDetails);
+  const { bun, ingredients: constructorIngredients } = useAppSelector(
+    (state) => state.burgerConstructor
+  );
 
   useEffect(() => {
     void dispatch(fetchIngredients());
@@ -36,11 +40,23 @@ export const App = (): React.JSX.Element => {
   );
 
   const handleOrderClick = useCallback((): void => {
+    if (!bun) {
+      return;
+    }
+
+    const ingredientIds = [
+      bun._id,
+      ...constructorIngredients.map((ingredient) => ingredient._id),
+      bun._id,
+    ];
+
     setIsOrderModalOpen(true);
-  }, []);
+    void dispatch(createOrder(ingredientIds));
+  }, [bun, constructorIngredients, dispatch]);
 
   const handleModalClose = useCallback((): void => {
     dispatch(clearSelectedIngredient());
+    dispatch(clearOrder());
     setIsOrderModalOpen(false);
   }, [dispatch]);
 
