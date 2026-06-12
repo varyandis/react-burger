@@ -8,7 +8,11 @@ import { useCallback, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { useAppDispatch, useAppSelector } from '@services/hooks';
-import { addIngredient, chooseBun } from '@services/slices/constructor-slice';
+import {
+  addIngredient,
+  chooseBun,
+  removeIngredient,
+} from '@services/slices/constructor-slice';
 import { DND_ITEM_TYPES } from '@utils/dnd';
 
 import type { TIngredient } from '@utils/types';
@@ -96,6 +100,7 @@ export const BurgerConstructor = ({
                 text={ingredient.name}
                 price={ingredient.price}
                 thumbnail={ingredient.image}
+                handleClose={() => dispatch(removeIngredient(ingredient.constructorId))}
               />
             </li>
           ))
