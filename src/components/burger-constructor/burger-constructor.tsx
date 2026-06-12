@@ -4,10 +4,11 @@ import {
   CurrencyIcon,
   DragIcon,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { useAppDispatch, useAppSelector } from '@services/hooks';
+import { selectConstructorTotalPrice } from '@services/selectors/constructor-selectors';
 import {
   addIngredient,
   chooseBun,
@@ -109,6 +110,7 @@ export const BurgerConstructor = ({
 }: TBurgerConstructorProps): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const { bun, ingredients } = useAppSelector((state) => state.burgerConstructor);
+  const totalPrice = useAppSelector(selectConstructorTotalPrice);
   const [{ isOver }, dropRef] = useDrop(
     () => ({
       accept: DND_ITEM_TYPES.ingredient,
@@ -145,15 +147,6 @@ export const BurgerConstructor = ({
     [dispatch]
   );
 
-  const totalPrice = useMemo(() => {
-    const bunPrice = bun ? bun.price * 2 : 0;
-    const ingredientsPrice = ingredients.reduce(
-      (sum, ingredient) => sum + ingredient.price,
-      0
-    );
-
-    return bunPrice + ingredientsPrice;
-  }, [bun, ingredients]);
   const isOrderDisabled = !bun || ingredients.length === 0;
 
   return (

@@ -2,6 +2,8 @@ import { Counter, CurrencyIcon, Tab } from '@krgaa/react-developer-burger-ui-com
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useDrag } from 'react-dnd';
 
+import { useAppSelector } from '@services/hooks';
+import { selectIngredientCounters } from '@services/selectors/constructor-selectors';
 import { DND_ITEM_TYPES } from '@utils/dnd';
 
 import type { TIngredient } from '@utils/types';
@@ -28,14 +30,6 @@ type TIngredientCardProps = {
 
 type TDragCollectedProps = {
   isDragging: boolean;
-};
-
-const getIngredientCount = (type: TIngredient['type'], index: number): number => {
-  if (index > 0) {
-    return 0;
-  }
-
-  return type === 'bun' ? 2 : 1;
 };
 
 const IngredientCard = ({
@@ -103,6 +97,7 @@ export const BurgerIngredients = ({
   onIngredientClick,
 }: TBurgerIngredientsProps): React.JSX.Element => {
   const [currentTab, setCurrentTab] = useState<TIngredient['type']>('bun');
+  const ingredientCounters = useAppSelector(selectIngredientCounters);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const sectionRefs = useRef<Record<TIngredient['type'], HTMLElement | null>>({
     bun: null,
@@ -226,8 +221,8 @@ export const BurgerIngredients = ({
           >
             <h2 className="text text_type_main-medium mb-6">{group.title}</h2>
             <ul className={`${styles.list} pl-4 pr-4`}>
-              {group.items.map((ingredient, index) => {
-                const count = getIngredientCount(ingredient.type, index);
+              {group.items.map((ingredient) => {
+                const count = ingredientCounters[ingredient._id] ?? 0;
 
                 return (
                   <li key={ingredient._id} className={styles.item}>
