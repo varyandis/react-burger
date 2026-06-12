@@ -1,5 +1,5 @@
 import { Counter, CurrencyIcon, Tab } from '@krgaa/react-developer-burger-ui-components';
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import type { TIngredient } from '@utils/types';
 
@@ -29,6 +29,7 @@ export const BurgerIngredients = ({
   onIngredientClick,
 }: TBurgerIngredientsProps): React.JSX.Element => {
   const [currentTab, setCurrentTab] = useState<TIngredient['type']>('bun');
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const sectionRefs = useRef<Record<TIngredient['type'], HTMLElement | null>>({
     bun: null,
     sauce: null,
@@ -69,6 +70,43 @@ export const BurgerIngredients = ({
     [buns, mains, sauces]
   );
 
+  const handleScroll = useCallback((): void => {
+    const contentElement = contentRef.current;
+
+    if (!contentElement) {
+      return;
+    }
+
+    const containerTop = contentElement.getBoundingClientRect().top;
+    const closestGroup = ingredientGroups.reduce<{
+      id: TIngredient['type'];
+      distance: number;
+    } | null>((closest, group) => {
+      const sectionElement = sectionRefs.current[group.id];
+
+      if (!sectionElement) {
+        return closest;
+      }
+
+      const distance = Math.abs(
+        sectionElement.getBoundingClientRect().top - containerTop
+      );
+
+      if (!closest || distance < closest.distance) {
+        return {
+          id: group.id,
+          distance,
+        };
+      }
+
+      return closest;
+    }, null);
+
+    if (closestGroup && closestGroup.id !== currentTab) {
+      setCurrentTab(closestGroup.id);
+    }
+  }, [currentTab, ingredientGroups]);
+
   const handleTabClick = (tab: string): void => {
     if (tab !== 'bun' && tab !== 'sauce' && tab !== 'main') {
       return;
@@ -99,7 +137,11 @@ export const BurgerIngredients = ({
           </Tab>
         </div>
       </nav>
-      <div className={`${styles.content} custom-scroll`}>
+      <div
+        ref={contentRef}
+        className={`${styles.content} custom-scroll`}
+        onScroll={handleScroll}
+      >
         {ingredientGroups.map((group) => (
           <section
             key={group.id}
