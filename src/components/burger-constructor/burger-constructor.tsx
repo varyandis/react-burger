@@ -5,18 +5,20 @@ import {
   DragIcon,
 } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useMemo } from 'react';
-import { useDrop } from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
 
 import { useAppDispatch, useAppSelector } from '@services/hooks';
 import {
   addIngredient,
   chooseBun,
+  moveIngredient,
   removeIngredient,
 } from '@services/slices/constructor-slice';
 import { DND_ITEM_TYPES } from '@utils/dnd';
 
+import type { TConstructorIngredient } from '@services/slices/constructor-slice';
 import type { TIngredient } from '@utils/types';
-import type { DropTargetMonitor } from 'react-dnd';
+import type { DragSourceMonitor, DropTargetMonitor } from 'react-dnd';
 
 import styles from './burger-constructor.module.css';
 
@@ -26,6 +28,80 @@ type TBurgerConstructorProps = {
 
 type TDropCollectedProps = {
   isOver: boolean;
+};
+
+type TConstructorIngredientItemProps = {
+  index: number;
+  ingredient: TConstructorIngredient;
+  onMove: (fromIndex: number, toIndex: number) => void;
+  onRemove: (constructorId: string) => void;
+};
+
+type TConstructorIngredientDragItem = {
+  constructorId: string;
+  index: number;
+};
+
+type TDragCollectedProps = {
+  isDragging: boolean;
+};
+
+const ConstructorIngredientItem = ({
+  index,
+  ingredient,
+  onMove,
+  onRemove,
+}: TConstructorIngredientItemProps): React.JSX.Element => {
+  const [{ isDragging }, dragRef] = useDrag(
+    () => ({
+      type: DND_ITEM_TYPES.constructorIngredient,
+      item: {
+        constructorId: ingredient.constructorId,
+        index,
+      },
+      collect: (monitor: DragSourceMonitor): TDragCollectedProps => ({
+        isDragging: monitor.isDragging(),
+      }),
+    }),
+    [index, ingredient.constructorId]
+  );
+  const [, dropRef] = useDrop(
+    () => ({
+      accept: DND_ITEM_TYPES.constructorIngredient,
+      hover: (dragItem: TConstructorIngredientDragItem): void => {
+        if (dragItem.constructorId === ingredient.constructorId) {
+          return;
+        }
+
+        onMove(dragItem.index, index);
+        dragItem.index = index;
+      },
+    }),
+    [index, ingredient.constructorId, onMove]
+  );
+  const setItemRef = useCallback(
+    (node: HTMLLIElement | null): void => {
+      dragRef(node);
+      dropRef(node);
+    },
+    [dragRef, dropRef]
+  );
+
+  return (
+    <li
+      ref={setItemRef}
+      className={styles.item}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+    >
+      <DragIcon type="primary" />
+      <ConstructorElement
+        text={ingredient.name}
+        price={ingredient.price}
+        thumbnail={ingredient.image}
+        handleClose={() => onRemove(ingredient.constructorId)}
+      />
+    </li>
+  );
 };
 
 export const BurgerConstructor = ({
@@ -55,6 +131,18 @@ export const BurgerConstructor = ({
       dropRef(node);
     },
     [dropRef]
+  );
+  const handleMoveIngredient = useCallback(
+    (fromIndex: number, toIndex: number): void => {
+      dispatch(moveIngredient({ fromIndex, toIndex }));
+    },
+    [dispatch]
+  );
+  const handleRemoveIngredient = useCallback(
+    (constructorId: string): void => {
+      dispatch(removeIngredient(constructorId));
+    },
+    [dispatch]
   );
 
   const totalPrice = useMemo(() => {
@@ -93,16 +181,14 @@ export const BurgerConstructor = ({
       </div>
       <ul className={`${styles.list} custom-scroll`}>
         {ingredients.length > 0 ? (
-          ingredients.map((ingredient) => (
-            <li key={ingredient.constructorId} className={styles.item}>
-              <DragIcon type="primary" />
-              <ConstructorElement
-                text={ingredient.name}
-                price={ingredient.price}
-                thumbnail={ingredient.image}
-                handleClose={() => dispatch(removeIngredient(ingredient.constructorId))}
-              />
-            </li>
+          ingredients.map((ingredient, index) => (
+            <ConstructorIngredientItem
+              key={ingredient.constructorId}
+              index={index}
+              ingredient={ingredient}
+              onMove={handleMoveIngredient}
+              onRemove={handleRemoveIngredient}
+            />
           ))
         ) : (
           <li className={`${styles.item} ${styles.empty_item}`}>
