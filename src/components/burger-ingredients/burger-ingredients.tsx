@@ -12,7 +12,6 @@ import type { DragSourceMonitor } from 'react-dnd';
 import styles from './burger-ingredients.module.css';
 
 type TBurgerIngredientsProps = {
-  ingredients: TIngredient[];
   onIngredientClick: (ingredient: TIngredient) => void;
 };
 
@@ -93,10 +92,10 @@ const IngredientCard = ({
 };
 
 export const BurgerIngredients = ({
-  ingredients,
   onIngredientClick,
 }: TBurgerIngredientsProps): React.JSX.Element => {
   const [currentTab, setCurrentTab] = useState<TIngredient['type']>('bun');
+  const { ingredients } = useAppSelector((state) => state.ingredients);
   const ingredientCounters = useAppSelector(selectIngredientCounters);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const sectionRefs = useRef<Record<TIngredient['type'], HTMLElement | null>>({

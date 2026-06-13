@@ -23,7 +23,7 @@ import styles from './app.module.css';
 export const App = (): React.JSX.Element => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const dispatch = useAppDispatch();
-  const { error, ingredients, isLoading } = useAppSelector((state) => state.ingredients);
+  const { error, isLoading } = useAppSelector((state) => state.ingredients);
   const { selectedIngredient } = useAppSelector((state) => state.ingredientDetails);
   const { bun, ingredients: constructorIngredients } = useAppSelector(
     (state) => state.burgerConstructor
@@ -73,10 +73,7 @@ export const App = (): React.JSX.Element => {
       )}
       {!isLoading && !error && (
         <main className={`${styles.main} pl-5 pr-5`}>
-          <BurgerIngredients
-            ingredients={ingredients}
-            onIngredientClick={handleIngredientClick}
-          />
+          <BurgerIngredients onIngredientClick={handleIngredientClick} />
           <BurgerConstructor onOrderClick={handleOrderClick} />
         </main>
       )}
