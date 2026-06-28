@@ -4,18 +4,62 @@ import {
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
+import { loginUser } from '@services/actions/auth-actions';
+import { useAppDispatch, useAppSelector } from '@services/hooks';
+import { selectAuthLoading } from '@services/slices/auth-slice';
 
 import type { ChangeEvent, FormEvent } from 'react';
 
 import styles from '../auth-form.module.css';
 
+type TLocationState = {
+  from?: {
+    hash: string;
+    pathname: string;
+    search: string;
+  };
+};
+
+const getSubmitErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  return 'Не удалось войти';
+};
+
 export const LoginPage = (): React.JSX.Element => {
+  const dispatch = useAppDispatch();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isLoading = useAppSelector(selectAuthLoading);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
+    setSubmitError('');
+
+    void dispatch(loginUser({ email, password }))
+      .unwrap()
+      .then(() => {
+        const { from } = (location.state as TLocationState | null) ?? {};
+        const redirectTo = from
+          ? `${from.pathname}${from.search}${from.hash}`
+          : '/';
+
+        void navigate(redirectTo, { replace: true });
+      })
+      .catch((error: unknown) => {
+        setSubmitError(getSubmitErrorMessage(error));
+      });
   };
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -44,8 +88,13 @@ export const LoginPage = (): React.JSX.Element => {
             onChange={handlePasswordChange}
           />
         </div>
+        {submitError && (
+          <p className={`${styles.error} text text_type_main-default`}>
+            {submitError}
+          </p>
+        )}
         <div className={`${styles.actions} mt-6 mb-20`}>
-          <Button htmlType="submit" type="primary" size="medium">
+          <Button disabled={isLoading} htmlType="submit" type="primary" size="medium">
             Войти
           </Button>
         </div>

@@ -38,3 +38,10 @@
   color: var(--colors-interface-accent, #4c4cff);
   text-decoration: none;
 }
+
+.error {
+  min-height: 24px;
+  margin: 16px 0 0;
+  color: var(--colors-interface-error, #e52b1a);
+  text-align: center;
+}

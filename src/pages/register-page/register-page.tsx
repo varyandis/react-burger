@@ -5,19 +5,49 @@ import {
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
+import { registerUser } from '@services/actions/auth-actions';
+import { useAppDispatch, useAppSelector } from '@services/hooks';
+import { selectAuthLoading } from '@services/slices/auth-slice';
 
 import type { ChangeEvent, FormEvent } from 'react';
 
 import styles from '../auth-form.module.css';
 
+const getSubmitErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  return 'Не удалось зарегистрироваться';
+};
+
 export const RegisterPage = (): React.JSX.Element => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const isLoading = useAppSelector(selectAuthLoading);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
+    setSubmitError('');
+
+    void dispatch(registerUser({ email, name, password }))
+      .unwrap()
+      .then(() => {
+        void navigate('/', { replace: true });
+      })
+      .catch((error: unknown) => {
+        setSubmitError(getSubmitErrorMessage(error));
+      });
   };
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -56,8 +86,13 @@ export const RegisterPage = (): React.JSX.Element => {
             onChange={handlePasswordChange}
           />
         </div>
+        {submitError && (
+          <p className={`${styles.error} text text_type_main-default`}>
+            {submitError}
+          </p>
+        )}
         <div className={`${styles.actions} mt-6 mb-20`}>
-          <Button htmlType="submit" type="primary" size="medium">
+          <Button disabled={isLoading} htmlType="submit" type="primary" size="medium">
             Зарегистрироваться
           </Button>
         </div>
