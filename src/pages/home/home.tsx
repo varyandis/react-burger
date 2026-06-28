@@ -1,0 +1,92 @@
+import { Preloader } from '@krgaa/react-developer-burger-ui-components';
+import { useCallback, useEffect, useState } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
+import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
+import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
+import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
+import { Modal } from '@components/modal/modal';
+import { OrderDetails } from '@components/order-details/order-details';
+import { fetchIngredients } from '@services/actions/ingredients-actions';
+import { createOrder } from '@services/actions/order-actions';
+import { useAppDispatch, useAppSelector } from '@services/hooks';
+import {
+  clearSelectedIngredient,
+  setSelectedIngredient,
+} from '@services/slices/ingredient-details-slice';
+import { clearOrder } from '@services/slices/order-slice';
+
+import type { TIngredient } from '@utils/types';
+
+import styles from './home.module.css';
+
+export const Home = (): React.JSX.Element => {
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const { error, isLoading } = useAppSelector((state) => state.ingredients);
+  const { selectedIngredient } = useAppSelector((state) => state.ingredientDetails);
+  const { bun, ingredients: constructorIngredients } = useAppSelector(
+    (state) => state.burgerConstructor
+  );
+
+  useEffect(() => {
+    void dispatch(fetchIngredients());
+  }, [dispatch]);
+
+  const handleIngredientClick = useCallback(
+    (ingredient: TIngredient): void => {
+      dispatch(setSelectedIngredient(ingredient));
+    },
+    [dispatch]
+  );
+
+  const handleOrderClick = useCallback((): void => {
+    if (!bun) {
+      return;
+    }
+
+    const ingredientIds = [
+      bun._id,
+      ...constructorIngredients.map((ingredient) => ingredient._id),
+      bun._id,
+    ];
+
+    setIsOrderModalOpen(true);
+    void dispatch(createOrder(ingredientIds));
+  }, [bun, constructorIngredients, dispatch]);
+
+  const handleModalClose = useCallback((): void => {
+    dispatch(clearSelectedIngredient());
+    dispatch(clearOrder());
+    setIsOrderModalOpen(false);
+  }, [dispatch]);
+
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <h1 className={`${styles.title} text text_type_main-large mt-10 mb-5 pl-5`}>
+        Соберите бургер
+      </h1>
+      {isLoading && <Preloader />}
+      {!isLoading && error && (
+        <p className="text text_type_main-default text_color_inactive">{error}</p>
+      )}
+      {!isLoading && !error && (
+        <main className={`${styles.main} pl-5 pr-5`}>
+          <BurgerIngredients onIngredientClick={handleIngredientClick} />
+          <BurgerConstructor onOrderClick={handleOrderClick} />
+        </main>
+      )}
+      {selectedIngredient && (
+        <Modal title="Детали ингредиента" onClose={handleModalClose}>
+          <IngredientDetails ingredient={selectedIngredient} />
+        </Modal>
+      )}
+      {isOrderModalOpen && (
+        <Modal ariaLabel="Детали заказа" onClose={handleModalClose}>
+          <OrderDetails />
+        </Modal>
+      )}
+    </DndProvider>
+  );
+};
