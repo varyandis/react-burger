@@ -2,19 +2,15 @@ import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
 import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
-import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
 import { Modal } from '@components/modal/modal';
 import { OrderDetails } from '@components/order-details/order-details';
 import { fetchIngredients } from '@services/actions/ingredients-actions';
 import { createOrder } from '@services/actions/order-actions';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
-import {
-  clearSelectedIngredient,
-  setSelectedIngredient,
-} from '@services/slices/ingredient-details-slice';
 import { clearOrder } from '@services/slices/order-slice';
 
 import type { TIngredient } from '@utils/types';
@@ -24,8 +20,9 @@ import styles from './home.module.css';
 export const Home = (): React.JSX.Element => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const dispatch = useAppDispatch();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { error, isLoading } = useAppSelector((state) => state.ingredients);
-  const { selectedIngredient } = useAppSelector((state) => state.ingredientDetails);
   const { bun, ingredients: constructorIngredients } = useAppSelector(
     (state) => state.burgerConstructor
   );
@@ -36,9 +33,11 @@ export const Home = (): React.JSX.Element => {
 
   const handleIngredientClick = useCallback(
     (ingredient: TIngredient): void => {
-      dispatch(setSelectedIngredient(ingredient));
+      void navigate(`/ingredients/${ingredient._id}`, {
+        state: { backgroundLocation: location },
+      });
     },
-    [dispatch]
+    [location, navigate]
   );
 
   const handleOrderClick = useCallback((): void => {
@@ -57,7 +56,6 @@ export const Home = (): React.JSX.Element => {
   }, [bun, constructorIngredients, dispatch]);
 
   const handleModalClose = useCallback((): void => {
-    dispatch(clearSelectedIngredient());
     dispatch(clearOrder());
     setIsOrderModalOpen(false);
   }, [dispatch]);
@@ -76,11 +74,6 @@ export const Home = (): React.JSX.Element => {
           <BurgerIngredients onIngredientClick={handleIngredientClick} />
           <BurgerConstructor onOrderClick={handleOrderClick} />
         </main>
-      )}
-      {selectedIngredient && (
-        <Modal title="Детали ингредиента" onClose={handleModalClose}>
-          <IngredientDetails ingredient={selectedIngredient} />
-        </Modal>
       )}
       {isOrderModalOpen && (
         <Modal ariaLabel="Детали заказа" onClose={handleModalClose}>
