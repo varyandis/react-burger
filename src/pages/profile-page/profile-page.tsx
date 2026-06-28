@@ -1,4 +1,11 @@
-import { Link, Outlet } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
+
+import styles from './profile-page.module.css';
+
+const getProfileLinkClassName = ({ isActive }: { isActive: boolean }): string =>
+  `${styles.link} ${
+    isActive ? styles.link_active : styles.link_inactive
+  } text text_type_main-medium mb-6`;
 
 export const ProfileContent = (): React.JSX.Element => {
   return (
@@ -13,18 +20,21 @@ export const ProfileContent = (): React.JSX.Element => {
 
 export const ProfilePage = (): React.JSX.Element => {
   return (
-    <main className="mt-20 ml-10 mr-10">
-      <div style={{ display: 'flex', gap: 60 }}>
-        <nav style={{ display: 'flex', flexDirection: 'column', minWidth: 320 }}>
-          <Link className="text text_type_main-medium mb-6" to="/profile">
+    <main className={`${styles.profile} mt-20 ml-10 mr-10`}>
+      <div className={styles.layout}>
+        <nav className={styles.menu}>
+          <NavLink className={getProfileLinkClassName} end to="/profile">
             Профиль
-          </Link>
-          <Link className="text text_type_main-medium mb-6" to="/profile/orders">
+          </NavLink>
+          <NavLink className={getProfileLinkClassName} to="/profile/orders">
             История заказов
-          </Link>
-          <Link className="text text_type_main-medium text_color_inactive" to="/login">
+          </NavLink>
+          <button
+            className={`${styles.exit} text text_type_main-medium text_color_inactive`}
+            type="button"
+          >
             Выход
-          </Link>
+          </button>
         </nav>
         <Outlet />
       </div>

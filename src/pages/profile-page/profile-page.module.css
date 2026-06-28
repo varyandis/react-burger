@@ -1,0 +1,35 @@
+.profile {
+  width: 100%;
+}
+
+.layout {
+  display: flex;
+  gap: 60px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.link_active {
+  color: var(--text-primary-color);
+}
+
+.link_inactive {
+  color: var(--text-inactive-color);
+}
+
+.exit {
+  align-self: flex-start;
+  padding: 0;
+  color: var(--text-inactive-color);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
