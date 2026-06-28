@@ -11,6 +11,7 @@ import { OrderDetails } from '@components/order-details/order-details';
 import { fetchIngredients } from '@services/actions/ingredients-actions';
 import { createOrder } from '@services/actions/order-actions';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
+import { selectIsAuthenticated } from '@services/slices/auth-slice';
 import { clearOrder } from '@services/slices/order-slice';
 
 import type { TIngredient } from '@utils/types';
@@ -23,6 +24,7 @@ export const Home = (): React.JSX.Element => {
   const location = useLocation();
   const navigate = useNavigate();
   const { error, isLoading } = useAppSelector((state) => state.ingredients);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const { bun, ingredients: constructorIngredients } = useAppSelector(
     (state) => state.burgerConstructor
   );
@@ -45,6 +47,11 @@ export const Home = (): React.JSX.Element => {
       return;
     }
 
+    if (!isAuthenticated) {
+      void navigate('/login', { state: { from: location } });
+      return;
+    }
+
     const ingredientIds = [
       bun._id,
       ...constructorIngredients.map((ingredient) => ingredient._id),
@@ -53,7 +60,7 @@ export const Home = (): React.JSX.Element => {
 
     setIsOrderModalOpen(true);
     void dispatch(createOrder(ingredientIds));
-  }, [bun, constructorIngredients, dispatch]);
+  }, [bun, constructorIngredients, dispatch, isAuthenticated, location, navigate]);
 
   const handleModalClose = useCallback((): void => {
     dispatch(clearOrder());

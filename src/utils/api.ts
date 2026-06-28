@@ -125,10 +125,11 @@ export const getIngredients = (): Promise<TIngredient[]> => {
 };
 
 export const createOrder = (ingredients: string[]): Promise<number> => {
-  return request<TOrderResponse>('/orders', {
+  return fetchWithRefresh<TOrderResponse>('/orders', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      authorization: getAccessToken() ?? '',
     },
     body: JSON.stringify({ ingredients }),
   }).then((res) => res.order.number);
