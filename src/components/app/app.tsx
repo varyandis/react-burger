@@ -1,91 +1,74 @@
-import { Preloader } from '@krgaa/react-developer-burger-ui-components';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
 import { AppHeader } from '@components/app-header/app-header';
-import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
-import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
-import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
 import { Modal } from '@components/modal/modal';
-import { OrderDetails } from '@components/order-details/order-details';
-import { fetchIngredients } from '@services/actions/ingredients-actions';
-import { createOrder } from '@services/actions/order-actions';
-import { useAppDispatch, useAppSelector } from '@services/hooks';
-import {
-  clearSelectedIngredient,
-  setSelectedIngredient,
-} from '@services/slices/ingredient-details-slice';
-import { clearOrder } from '@services/slices/order-slice';
-
-import type { TIngredient } from '@utils/types';
+import { ProtectedRoute } from '@components/protected-route/protected-route';
+import { FeedPage } from '@pages/feed-page/feed-page';
+import { ForgotPasswordPage } from '@pages/forgot-password-page/forgot-password-page';
+import { Home } from '@pages/home/home';
+import { IngredientDetailsPage } from '@pages/ingredient-details-page/ingredient-details-page';
+import { LoginPage } from '@pages/login-page/login-page';
+import { NotFoundPage } from '@pages/not-found-page/not-found-page';
+import { ProfileOrderPage } from '@pages/profile-order-page/profile-order-page';
+import { ProfileContent, ProfilePage } from '@pages/profile-page/profile-page';
+import { RegisterPage } from '@pages/register-page/register-page';
+import { ResetPasswordPage } from '@pages/reset-password-page/reset-password-page';
+import { checkAuth } from '@services/actions/auth-actions';
+import { useAppDispatch } from '@services/hooks';
 
 import styles from './app.module.css';
 
+type TLocationState = {
+  backgroundLocation?: ReturnType<typeof useLocation>;
+};
+
 export const App = (): React.JSX.Element => {
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const dispatch = useAppDispatch();
-  const { error, isLoading } = useAppSelector((state) => state.ingredients);
-  const { selectedIngredient } = useAppSelector((state) => state.ingredientDetails);
-  const { bun, ingredients: constructorIngredients } = useAppSelector(
-    (state) => state.burgerConstructor
-  );
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { backgroundLocation } = (location.state as TLocationState | null) ?? {};
 
   useEffect(() => {
-    void dispatch(fetchIngredients());
+    void dispatch(checkAuth());
   }, [dispatch]);
 
-  const handleIngredientClick = useCallback(
-    (ingredient: TIngredient): void => {
-      dispatch(setSelectedIngredient(ingredient));
-    },
-    [dispatch]
-  );
-
-  const handleOrderClick = useCallback((): void => {
-    if (!bun) {
-      return;
-    }
-
-    const ingredientIds = [
-      bun._id,
-      ...constructorIngredients.map((ingredient) => ingredient._id),
-      bun._id,
-    ];
-
-    setIsOrderModalOpen(true);
-    void dispatch(createOrder(ingredientIds));
-  }, [bun, constructorIngredients, dispatch]);
-
-  const handleModalClose = useCallback((): void => {
-    dispatch(clearSelectedIngredient());
-    dispatch(clearOrder());
-    setIsOrderModalOpen(false);
-  }, [dispatch]);
+  const handleIngredientModalClose = useCallback((): void => {
+    void navigate('/');
+  }, [navigate]);
 
   return (
     <div className={styles.app}>
       <AppHeader />
-      <h1 className={`${styles.title} text text_type_main-large mt-10 mb-5 pl-5`}>
-        Соберите бургер
-      </h1>
-      {isLoading && <Preloader />}
-      {!isLoading && error && (
-        <p className="text text_type_main-default text_color_inactive">{error}</p>
-      )}
-      {!isLoading && !error && (
-        <main className={`${styles.main} pl-5 pr-5`}>
-          <BurgerIngredients onIngredientClick={handleIngredientClick} />
-          <BurgerConstructor onOrderClick={handleOrderClick} />
-        </main>
-      )}
-      {selectedIngredient && (
-        <Modal title="Детали ингредиента" onClose={handleModalClose}>
-          <IngredientDetails ingredient={selectedIngredient} />
-        </Modal>
-      )}
-      {isOrderModalOpen && (
-        <Modal ariaLabel="Детали заказа" onClose={handleModalClose}>
-          <OrderDetails />
-        </Modal>
+      <Routes location={backgroundLocation ?? location}>
+        <Route path="/" element={<Home />} />
+        <Route path="/ingredients/:id" element={<IngredientDetailsPage />} />
+        <Route element={<ProtectedRoute anonymousOnly />}>
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+        </Route>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/profile" element={<ProfilePage />}>
+            <Route index element={<ProfileContent />} />
+            <Route path="orders" element={<ProfileOrderPage />} />
+          </Route>
+        </Route>
+        <Route path="/feed" element={<FeedPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+      {backgroundLocation && (
+        <Routes>
+          <Route
+            path="/ingredients/:id"
+            element={
+              <Modal title="Детали ингредиента" onClose={handleIngredientModalClose}>
+                <IngredientDetailsPage isModal />
+              </Modal>
+            }
+          />
+        </Routes>
       )}
     </div>
   );

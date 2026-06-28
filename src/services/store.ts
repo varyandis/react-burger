@@ -1,11 +1,13 @@
 import { combineSlices, configureStore } from '@reduxjs/toolkit';
 
+import { authSlice } from '@services/slices/auth-slice';
 import { constructorSlice } from '@services/slices/constructor-slice';
 import { ingredientDetailsSlice } from '@services/slices/ingredient-details-slice';
 import { ingredientsSlice } from '@services/slices/ingredients-slice';
 import { orderSlice } from '@services/slices/order-slice';
 
 const rootReducer = combineSlices(
+  authSlice,
   constructorSlice,
   ingredientDetailsSlice,
   ingredientsSlice,

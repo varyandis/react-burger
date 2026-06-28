@@ -1,0 +1,10 @@
+.page {
+  width: 100%;
+  max-width: 720px;
+  margin: 120px auto 0;
+  text-align: center;
+}
+
+.message {
+  text-align: center;
+}
