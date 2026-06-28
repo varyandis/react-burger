@@ -36,20 +36,19 @@ export const registerUser = createAsyncThunk<
   }
 });
 
-export const loginUser = createAsyncThunk<
-  TUser,
-  TAuthRequest,
-  { rejectValue: string }
->('auth/loginUser', async (credentials, { rejectWithValue }) => {
-  try {
-    const response = await loginUserApi(credentials);
-    setTokens(response);
+export const loginUser = createAsyncThunk<TUser, TAuthRequest, { rejectValue: string }>(
+  'auth/loginUser',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await loginUserApi(credentials);
+      setTokens(response);
 
-    return response.user;
-  } catch (error) {
-    return rejectWithValue(error instanceof Error ? error.message : 'Failed to login');
+      return response.user;
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to login');
+    }
   }
-});
+);
 
 export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
   'auth/logoutUser',
@@ -65,28 +64,27 @@ export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
   }
 );
 
-export const checkAuth = createAsyncThunk<
-  TUser | null,
-  void,
-  { rejectValue: string }
->('auth/checkAuth', async (_, { rejectWithValue }) => {
-  const accessToken = getAccessToken();
-  const refreshToken = getRefreshToken();
+export const checkAuth = createAsyncThunk<TUser | null, void, { rejectValue: string }>(
+  'auth/checkAuth',
+  async (_, { rejectWithValue }) => {
+    const accessToken = getAccessToken();
+    const refreshToken = getRefreshToken();
 
-  if (!accessToken || !refreshToken) {
-    return null;
+    if (!accessToken || !refreshToken) {
+      return null;
+    }
+
+    try {
+      return await getUserApi();
+    } catch (error) {
+      removeTokens();
+
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Failed to check auth'
+      );
+    }
   }
-
-  try {
-    return await getUserApi();
-  } catch (error) {
-    removeTokens();
-
-    return rejectWithValue(
-      error instanceof Error ? error.message : 'Failed to check auth'
-    );
-  }
-});
+);
 
 export const updateUser = createAsyncThunk<
   TUser,

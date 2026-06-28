@@ -51,9 +51,7 @@ export const LoginPage = (): React.JSX.Element => {
       .unwrap()
       .then(() => {
         const { from } = (location.state as TLocationState | null) ?? {};
-        const redirectTo = from
-          ? `${from.pathname}${from.search}${from.hash}`
-          : '/';
+        const redirectTo = from ? `${from.pathname}${from.search}${from.hash}` : '/';
 
         void navigate(redirectTo, { replace: true });
       })
@@ -89,9 +87,7 @@ export const LoginPage = (): React.JSX.Element => {
           />
         </div>
         {submitError && (
-          <p className={`${styles.error} text text_type_main-default`}>
-            {submitError}
-          </p>
+          <p className={`${styles.error} text text_type_main-default`}>{submitError}</p>
         )}
         <div className={`${styles.actions} mt-6 mb-20`}>
           <Button disabled={isLoading} htmlType="submit" type="primary" size="medium">

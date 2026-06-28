@@ -54,7 +54,9 @@ export const ForgotPasswordPage = (): React.JSX.Element => {
             onChange={handleEmailChange}
           />
         </div>
-        {error && <p className={`${styles.error} text text_type_main-default`}>{error}</p>}
+        {error && (
+          <p className={`${styles.error} text text_type_main-default`}>{error}</p>
+        )}
         <div className={`${styles.actions} mt-6 mb-20`}>
           <Button disabled={isLoading} htmlType="submit" type="primary" size="medium">
             Восстановить

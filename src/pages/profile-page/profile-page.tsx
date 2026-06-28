@@ -6,15 +6,9 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
-import {
-  logoutUser,
-  updateUser,
-} from '@services/actions/auth-actions';
+import { logoutUser, updateUser } from '@services/actions/auth-actions';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
-import {
-  selectAuthLoading,
-  selectUser,
-} from '@services/slices/auth-slice';
+import { selectAuthLoading, selectUser } from '@services/slices/auth-slice';
 
 import type { ChangeEvent, FormEvent } from 'react';
 
@@ -116,9 +110,7 @@ export const ProfileContent = (): React.JSX.Element => {
         onChange={handlePasswordChange}
       />
       {submitError && (
-        <p className={`${styles.error} text text_type_main-default`}>
-          {submitError}
-        </p>
+        <p className={`${styles.error} text text_type_main-default`}>{submitError}</p>
       )}
       {isFormChanged && (
         <div className={styles.actions}>

@@ -87,9 +87,7 @@ export const RegisterPage = (): React.JSX.Element => {
           />
         </div>
         {submitError && (
-          <p className={`${styles.error} text text_type_main-default`}>
-            {submitError}
-          </p>
+          <p className={`${styles.error} text text_type_main-default`}>{submitError}</p>
         )}
         <div className={`${styles.actions} mt-6 mb-20`}>
           <Button disabled={isLoading} htmlType="submit" type="primary" size="medium">

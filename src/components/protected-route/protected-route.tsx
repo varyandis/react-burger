@@ -1,11 +1,8 @@
 import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
-import {
-  selectIsAuthenticated,
-  selectIsAuthChecked,
-} from '@services/slices/auth-slice';
 import { useAppSelector } from '@services/hooks';
+import { selectIsAuthenticated, selectIsAuthChecked } from '@services/slices/auth-slice';
 
 import type { ReactNode } from 'react';
 
