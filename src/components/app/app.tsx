@@ -7,56 +7,59 @@ import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredi
 import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
 import { Modal } from '@components/modal/modal';
 import { OrderDetails } from '@components/order-details/order-details';
-import { getIngredients } from '@utils/api';
+import { fetchIngredients } from '@services/actions/ingredients-actions';
+import { createOrder } from '@services/actions/order-actions';
+import { useAppDispatch, useAppSelector } from '@services/hooks';
+import {
+  clearSelectedIngredient,
+  setSelectedIngredient,
+} from '@services/slices/ingredient-details-slice';
+import { clearOrder } from '@services/slices/order-slice';
 
 import type { TIngredient } from '@utils/types';
 
 import styles from './app.module.css';
 
 export const App = (): React.JSX.Element => {
-  const [ingredients, setIngredients] = useState<TIngredient[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [selectedIngredient, setSelectedIngredient] = useState<TIngredient | null>(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const { error, isLoading } = useAppSelector((state) => state.ingredients);
+  const { selectedIngredient } = useAppSelector((state) => state.ingredientDetails);
+  const { bun, ingredients: constructorIngredients } = useAppSelector(
+    (state) => state.burgerConstructor
+  );
 
   useEffect(() => {
-    let isMounted = true;
+    void dispatch(fetchIngredients());
+  }, [dispatch]);
 
-    getIngredients()
-      .then((ingredientsData) => {
-        if (isMounted) {
-          setIngredients(ingredientsData);
-        }
-      })
-      .catch((err: Error) => {
-        if (isMounted) {
-          setError(err.message);
-        }
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      });
-
-    return (): void => {
-      isMounted = false;
-    };
-  }, []);
-
-  const handleIngredientClick = useCallback((ingredient: TIngredient): void => {
-    setSelectedIngredient(ingredient);
-  }, []);
+  const handleIngredientClick = useCallback(
+    (ingredient: TIngredient): void => {
+      dispatch(setSelectedIngredient(ingredient));
+    },
+    [dispatch]
+  );
 
   const handleOrderClick = useCallback((): void => {
+    if (!bun) {
+      return;
+    }
+
+    const ingredientIds = [
+      bun._id,
+      ...constructorIngredients.map((ingredient) => ingredient._id),
+      bun._id,
+    ];
+
     setIsOrderModalOpen(true);
-  }, []);
+    void dispatch(createOrder(ingredientIds));
+  }, [bun, constructorIngredients, dispatch]);
 
   const handleModalClose = useCallback((): void => {
-    setSelectedIngredient(null);
+    dispatch(clearSelectedIngredient());
+    dispatch(clearOrder());
     setIsOrderModalOpen(false);
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className={styles.app}>
@@ -70,11 +73,8 @@ export const App = (): React.JSX.Element => {
       )}
       {!isLoading && !error && (
         <main className={`${styles.main} pl-5 pr-5`}>
-          <BurgerIngredients
-            ingredients={ingredients}
-            onIngredientClick={handleIngredientClick}
-          />
-          <BurgerConstructor ingredients={ingredients} onOrderClick={handleOrderClick} />
+          <BurgerIngredients onIngredientClick={handleIngredientClick} />
+          <BurgerConstructor onOrderClick={handleOrderClick} />
         </main>
       )}
       {selectedIngredient && (

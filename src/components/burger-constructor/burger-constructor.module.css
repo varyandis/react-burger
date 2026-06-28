@@ -5,6 +5,11 @@
   min-height: 0;
   padding-bottom: 20px;
   color: var(--text-primary-color);
+  border-radius: 40px;
+}
+
+.burger_constructor_hover {
+  outline: 1px solid var(--colors-interface-accent);
 }
 
 .list {
@@ -25,6 +30,10 @@
   gap: 8px;
 }
 
+.empty_item {
+  padding-left: 32px;
+}
+
 .summary {
   display: flex;
   justify-content: flex-end;
@@ -35,4 +44,30 @@
 .price {
   display: flex;
   align-items: center;
+}
+
+.placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  width: 536px;
+  min-height: 80px;
+  padding: 16px 24px;
+  text-align: center;
+  background: var(--background-element);
+  border-radius: var(--common-border-radius-s);
+}
+
+.placeholder_active {
+  outline: 1px solid var(--colors-interface-accent);
+  box-shadow: 0 0 16px rgb(76 76 255 / 25%);
+}
+
+.placeholder_top {
+  border-radius: var(--top-constructor-item-border-radius);
+}
+
+.placeholder_bottom {
+  border-radius: var(--bottom-constructor-item-border-radius);
 }
