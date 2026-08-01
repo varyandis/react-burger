@@ -3,7 +3,7 @@ import { checker } from 'vite-plugin-checker';
 import readableClassnames from 'vite-plugin-readable-classnames';
 import sassDts from 'vite-plugin-sass-dts';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -21,8 +21,10 @@ export default defineConfig({
   ],
   base: '',
   test: {
+    exclude: [...configDefaults.exclude, 'e2e/**'],
     globals: true,
     environment: 'jsdom',
+    passWithNoTests: true,
     setupFiles: ['./vitest-setup.ts'],
   },
   server: {

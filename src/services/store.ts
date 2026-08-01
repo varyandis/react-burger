@@ -6,7 +6,7 @@ import { ingredientDetailsSlice } from '@services/slices/ingredient-details-slic
 import { ingredientsSlice } from '@services/slices/ingredients-slice';
 import { orderSlice } from '@services/slices/order-slice';
 
-const rootReducer = combineSlices(
+export const rootReducer = combineSlices(
   authSlice,
   constructorSlice,
   ingredientDetailsSlice,
@@ -19,5 +19,5 @@ export const store = configureStore({
   devTools: import.meta.env.DEV,
 });
 
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = typeof store.dispatch;
