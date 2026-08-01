@@ -5,6 +5,7 @@ import type {
   TIngredient,
   TIngredientsResponse,
   TOrderResponse,
+  TOrdersResponse,
   TRegisterUserRequest,
   TResetPasswordRequest,
   TSuccessResponse,
@@ -133,6 +134,10 @@ export const createOrder = (ingredients: string[]): Promise<number> => {
     },
     body: JSON.stringify({ ingredients }),
   }).then((res) => res.order.number);
+};
+
+export const getOrder = (number: number): Promise<TOrdersResponse> => {
+  return request<TOrdersResponse>(`/orders/${number}`);
 };
 
 export const registerUserApi = ({

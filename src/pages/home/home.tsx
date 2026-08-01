@@ -1,5 +1,5 @@
 import { Preloader } from '@krgaa/react-developer-burger-ui-components';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -8,7 +8,6 @@ import { BurgerConstructor } from '@components/burger-constructor/burger-constru
 import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
 import { Modal } from '@components/modal/modal';
 import { OrderDetails } from '@components/order-details/order-details';
-import { fetchIngredients } from '@services/actions/ingredients-actions';
 import { createOrder } from '@services/actions/order-actions';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
 import { selectIsAuthenticated } from '@services/slices/auth-slice';
@@ -28,10 +27,6 @@ export const Home = (): React.JSX.Element => {
   const { bun, ingredients: constructorIngredients } = useAppSelector(
     (state) => state.burgerConstructor
   );
-
-  useEffect(() => {
-    void dispatch(fetchIngredients());
-  }, [dispatch]);
 
   const handleIngredientClick = useCallback(
     (ingredient: TIngredient): void => {
