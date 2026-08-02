@@ -8,6 +8,7 @@ type TProfileOrdersState = {
   orders: TOrder[];
   isConnecting: boolean;
   isConnected: boolean;
+  hasReceived: boolean;
   error: string | null;
 };
 
@@ -15,6 +16,7 @@ const initialState: TProfileOrdersState = {
   orders: [],
   isConnecting: false,
   isConnected: false,
+  hasReceived: false,
   error: null,
 };
 
@@ -26,6 +28,7 @@ export const profileOrdersSlice = createSlice({
     builder
       .addCase(profileWsActions.connecting, (state) => {
         state.isConnecting = true;
+        state.hasReceived = false;
         state.error = null;
       })
       .addCase(profileWsActions.open, (state) => {
@@ -35,11 +38,13 @@ export const profileOrdersSlice = createSlice({
       .addCase(profileWsActions.close, (state) => {
         state.isConnecting = false;
         state.isConnected = false;
+        state.hasReceived = false;
       })
       .addCase(profileWsActions.error, (state, action) => {
         state.error = action.payload;
       })
       .addCase(profileWsActions.message, (state, action) => {
+        state.hasReceived = true;
         state.orders = action.payload.orders;
         state.error = null;
       });

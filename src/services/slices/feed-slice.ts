@@ -10,6 +10,7 @@ type TFeedState = {
   totalToday: number;
   isConnecting: boolean;
   isConnected: boolean;
+  hasReceived: boolean;
   error: string | null;
 };
 
@@ -19,6 +20,7 @@ const initialState: TFeedState = {
   totalToday: 0,
   isConnecting: false,
   isConnected: false,
+  hasReceived: false,
   error: null,
 };
 
@@ -30,6 +32,7 @@ export const feedSlice = createSlice({
     builder
       .addCase(feedWsActions.connecting, (state) => {
         state.isConnecting = true;
+        state.hasReceived = false;
         state.error = null;
       })
       .addCase(feedWsActions.open, (state) => {
@@ -39,11 +42,13 @@ export const feedSlice = createSlice({
       .addCase(feedWsActions.close, (state) => {
         state.isConnecting = false;
         state.isConnected = false;
+        state.hasReceived = false;
       })
       .addCase(feedWsActions.error, (state, action) => {
         state.error = action.payload;
       })
       .addCase(feedWsActions.message, (state, action) => {
+        state.hasReceived = true;
         state.orders = action.payload.orders;
         state.total = action.payload.total;
         state.totalToday = action.payload.totalToday;

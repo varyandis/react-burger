@@ -1,8 +1,9 @@
 import { CurrencyIcon, Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
-import { useAppSelector } from '@services/hooks';
+import { useAppDispatch, useAppSelector } from '@services/hooks';
+import { feedWsActions, profileWsActions } from '@services/ws-actions';
 import { getOrder } from '@utils/api';
 import { getOrderIngredients, getOrderPrice, getStatusText } from '@utils/orders';
 
@@ -10,24 +11,44 @@ import type { TIngredient, TOrder } from '@utils/types';
 
 import styles from './order-info.module.css';
 
+const FEED_URL = 'wss://new-stellarburgers.education-services.ru/orders/all';
+const PROFILE_ORDERS_URL = 'wss://new-stellarburgers.education-services.ru/orders';
+
 type TOrderInfoProps = {
   isModal?: boolean;
 };
 
 export const OrderInfo = ({ isModal = false }: TOrderInfoProps): React.JSX.Element => {
+  const dispatch = useAppDispatch();
+  const { pathname } = useLocation();
   const { id } = useParams();
   const number = Number(id);
+  const isProfileOrder = pathname.startsWith('/profile/orders/');
   const feedOrders = useAppSelector((state) => state.feed.orders);
   const profileOrders = useAppSelector((state) => state.profileOrders.orders);
   const ingredients = useAppSelector((state) => state.ingredients.ingredients);
-  const socketOrder = [...feedOrders, ...profileOrders].find(
-    (item) => item.number === number
+  const hasReceived = useAppSelector((state) =>
+    isProfileOrder ? state.profileOrders.hasReceived : state.feed.hasReceived
   );
+  const socketOrders = isProfileOrder ? profileOrders : feedOrders;
+  const socketOrder = socketOrders.find((item) => item.number === number);
   const [fetchedOrder, setFetchedOrder] = useState<TOrder | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (socketOrder || !Number.isFinite(number)) return;
+    if (isModal) return;
+
+    const actions = isProfileOrder ? profileWsActions : feedWsActions;
+    const url = isProfileOrder ? PROFILE_ORDERS_URL : FEED_URL;
+    dispatch(actions.connect(url));
+
+    return (): void => {
+      dispatch(actions.disconnect());
+    };
+  }, [dispatch, isModal, isProfileOrder]);
+
+  useEffect(() => {
+    if (socketOrder || !Number.isFinite(number) || (!isModal && !hasReceived)) return;
 
     void getOrder(number)
       .then((response) => {
@@ -41,7 +62,7 @@ export const OrderInfo = ({ isModal = false }: TOrderInfoProps): React.JSX.Eleme
             : 'Не удалось загрузить заказ'
         );
       });
-  }, [number, socketOrder]);
+  }, [hasReceived, isModal, number, socketOrder]);
 
   const order = socketOrder ?? fetchedOrder;
   const groupedIngredients = useMemo(() => {
