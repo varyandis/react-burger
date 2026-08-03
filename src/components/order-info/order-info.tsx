@@ -48,7 +48,7 @@ export const OrderInfo = ({ isModal = false }: TOrderInfoProps): React.JSX.Eleme
   }, [dispatch, isModal, isProfileOrder]);
 
   useEffect(() => {
-    if (socketOrder || !Number.isFinite(number) || (!isModal && !hasReceived)) return;
+    if (socketOrder || !Number.isFinite(number) || !hasReceived) return;
 
     void getOrder(number)
       .then((response) => {
