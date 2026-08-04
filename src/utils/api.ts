@@ -5,6 +5,7 @@ import type {
   TIngredient,
   TIngredientsResponse,
   TOrderResponse,
+  TOrdersResponse,
   TRegisterUserRequest,
   TResetPasswordRequest,
   TSuccessResponse,
@@ -51,7 +52,14 @@ const createApiError = (message: string, status?: number): TApiError => {
 };
 
 const checkResponse = async <T>(res: Response): Promise<T> => {
-  const data = (await res.json()) as T & { message?: string };
+  const responseText = await res.text();
+  let data: T & { message?: string };
+
+  try {
+    data = JSON.parse(responseText) as T & { message?: string };
+  } catch {
+    throw createApiError(`Request failed with status ${res.status}`, res.status);
+  }
 
   if (!res.ok) {
     throw createApiError(
@@ -133,6 +141,10 @@ export const createOrder = (ingredients: string[]): Promise<number> => {
     },
     body: JSON.stringify({ ingredients }),
   }).then((res) => res.order.number);
+};
+
+export const getOrder = (number: number): Promise<TOrdersResponse> => {
+  return request<TOrdersResponse>(`/orders/${number}`);
 };
 
 export const registerUserApi = ({
