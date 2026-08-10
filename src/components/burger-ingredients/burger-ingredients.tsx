@@ -57,6 +57,7 @@ const IngredientCard = ({
     <article
       ref={setDragRef}
       className={styles.card}
+      data-testid={`ingredient-${ingredient._id}`}
       role="button"
       tabIndex={0}
       style={{ opacity: isDragging ? 0.5 : 1 }}
