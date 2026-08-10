@@ -1,21 +1,13 @@
 import { feedWsActions } from '@services/ws-actions';
 
-import { feedSlice } from './feed-slice';
+import { feedSlice, initialState } from './feed-slice';
 import { orderFixture } from './test-fixtures';
 
 const feedReducer = feedSlice.reducer;
 
 describe('feedReducer', () => {
   it('returns the initial state', () => {
-    expect(feedReducer(undefined, { type: 'unknown' })).toEqual({
-      orders: [],
-      total: 0,
-      totalToday: 0,
-      isConnecting: false,
-      isConnected: false,
-      hasReceived: false,
-      error: null,
-    });
+    expect(feedReducer(undefined, { type: 'unknown' })).toEqual(initialState);
   });
 
   it('handles websocket connection actions', () => {

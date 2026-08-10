@@ -3,6 +3,7 @@ import {
   chooseBun,
   clearConstructor,
   constructorReducer,
+  initialState,
   moveIngredient,
   removeIngredient,
 } from './constructor-slice';
@@ -10,10 +11,7 @@ import { bunFixture, ingredientFixture } from './test-fixtures';
 
 describe('constructorReducer', () => {
   it('returns the initial state', () => {
-    expect(constructorReducer(undefined, { type: 'unknown' })).toEqual({
-      bun: null,
-      ingredients: [],
-    });
+    expect(constructorReducer(undefined, { type: 'unknown' })).toEqual(initialState);
   });
 
   it('chooses and replaces a bun', () => {

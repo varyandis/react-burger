@@ -1,15 +1,11 @@
 import { fetchIngredients } from '@services/actions/ingredients-actions';
 
-import { ingredientsReducer } from './ingredients-slice';
+import { ingredientsReducer, initialState } from './ingredients-slice';
 import { ingredientFixture } from './test-fixtures';
 
 describe('ingredientsReducer', () => {
   it('returns the initial state', () => {
-    expect(ingredientsReducer(undefined, { type: 'unknown' })).toEqual({
-      ingredients: [],
-      isLoading: true,
-      error: '',
-    });
+    expect(ingredientsReducer(undefined, { type: 'unknown' })).toEqual(initialState);
   });
 
   it('handles loading, success and failure', () => {

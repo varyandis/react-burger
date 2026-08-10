@@ -6,18 +6,12 @@ import {
   updateUser,
 } from '@services/actions/auth-actions';
 
-import { authReducer } from './auth-slice';
+import { authReducer, initialState } from './auth-slice';
 import { userFixture } from './test-fixtures';
 
 describe('authReducer', () => {
   it('returns the initial state', () => {
-    expect(authReducer(undefined, { type: 'unknown' })).toEqual({
-      user: null,
-      isAuthenticated: false,
-      isAuthChecked: false,
-      isLoading: false,
-      error: null,
-    });
+    expect(authReducer(undefined, { type: 'unknown' })).toEqual(initialState);
   });
 
   it.each([registerUser, loginUser, logoutUser, checkAuth, updateUser])(

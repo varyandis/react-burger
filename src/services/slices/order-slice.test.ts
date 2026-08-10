@@ -1,14 +1,10 @@
 import { createOrder } from '@services/actions/order-actions';
 
-import { clearOrder, orderReducer } from './order-slice';
+import { clearOrder, initialState, orderReducer } from './order-slice';
 
 describe('orderReducer', () => {
   it('returns the initial state', () => {
-    expect(orderReducer(undefined, { type: 'unknown' })).toEqual({
-      orderNumber: null,
-      isLoading: false,
-      error: null,
-    });
+    expect(orderReducer(undefined, { type: 'unknown' })).toEqual(initialState);
   });
 
   it('handles order creation lifecycle', () => {

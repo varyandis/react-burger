@@ -1,5 +1,22 @@
 import { expect, test } from '@playwright/test';
 
+import type { Locator, Page } from '@playwright/test';
+
+const dragIngredient = async (
+  page: Page,
+  ingredient: Locator,
+  constructor: Locator
+): Promise<void> => {
+  const dataTransfer = await page.evaluateHandle(() => new DataTransfer());
+
+  await ingredient.dispatchEvent('dragstart', { dataTransfer });
+  await constructor.dispatchEvent('dragenter', { dataTransfer });
+  await constructor.dispatchEvent('dragover', { dataTransfer });
+  await constructor.dispatchEvent('drop', { dataTransfer });
+  await ingredient.dispatchEvent('dragend', { dataTransfer });
+  await dataTransfer.dispose();
+};
+
 test.describe('Страница конструктора', () => {
   test.beforeEach(async ({ page }) => {
     await page.routeFromHAR('e2e/mocks/api.har', {
@@ -11,7 +28,7 @@ test.describe('Страница конструктора', () => {
       localStorage.setItem('accessToken', 'Bearer e2e-access-token');
       localStorage.setItem('refreshToken', 'e2e-refresh-token');
     });
-    await page.goto('./');
+    await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Соберите бургер' })).toBeVisible();
   });
 
@@ -30,8 +47,8 @@ test.describe('Страница конструктора', () => {
     await ingredientDialog.getByRole('button', { name: 'Закрыть' }).click();
     await expect(ingredientDialog).not.toBeVisible();
 
-    await bun.dragTo(constructor);
-    await filling.dragTo(constructor);
+    await dragIngredient(page, bun, constructor);
+    await dragIngredient(page, filling, constructor);
     await expect(constructor.getByText('Краторная булка N-200i (верх)')).toBeVisible();
     await expect(
       constructor.getByText('Биокотлета из марсианской Магнолии')

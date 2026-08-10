@@ -1,19 +1,13 @@
 import { profileWsActions } from '@services/ws-actions';
 
-import { profileOrdersSlice } from './profile-orders-slice';
+import { initialState, profileOrdersSlice } from './profile-orders-slice';
 import { orderFixture } from './test-fixtures';
 
 const profileOrdersReducer = profileOrdersSlice.reducer;
 
 describe('profileOrdersReducer', () => {
   it('returns the initial state', () => {
-    expect(profileOrdersReducer(undefined, { type: 'unknown' })).toEqual({
-      orders: [],
-      isConnecting: false,
-      isConnected: false,
-      hasReceived: false,
-      error: null,
-    });
+    expect(profileOrdersReducer(undefined, { type: 'unknown' })).toEqual(initialState);
   });
 
   it('handles websocket connection actions', () => {
