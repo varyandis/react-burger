@@ -162,6 +162,7 @@ export const BurgerConstructor = ({
     <section
       ref={setDropRef}
       className={`${styles.burger_constructor} ${isOver ? styles.burger_constructor_hover : ''} pt-25 pl-4`}
+      data-testid="burger-constructor"
       aria-label="Конструктор бургера"
     >
       <div className="pl-8 mb-4">

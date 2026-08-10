@@ -19,7 +19,7 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
-  base: '',
+  base: '/react-burger/',
   test: {
     exclude: [...configDefaults.exclude, 'e2e/**'],
     globals: true,

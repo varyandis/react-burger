@@ -12,7 +12,7 @@ type TProfileOrdersState = {
   error: string | null;
 };
 
-const initialState: TProfileOrdersState = {
+export const initialState: TProfileOrdersState = {
   orders: [],
   isConnecting: false,
   isConnected: false,
